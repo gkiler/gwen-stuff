@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Snoopy Shirt Vote</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap">
+</head>
+<body>
+<style id="css">
+/*
+VOICE: warm family holiday, playful but tidy; Dad has to be able to order from it.
+IDEA: a holiday catalog order form, where the shirt photos are the ballot.
+PICTURE: the six shirt cards at the top, tappable to vote.
+COLOUR and TYPE: Peanuts red band, pine green for actions, Woodstock yellow as the one sharp accent; Fredoka titles, Nunito body.
+LAYOUT: red title band, card grid, your-vote form, results bars, Dad's order list.
+*/
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#0f1a14);--ink:light-dark(#1d1b1a,#f3efe8);--soft:light-dark(#5d5853,#b9b2a8);
+--line:light-dark(#e6e1da,#2b3a31);--card:light-dark(#ffffff,#16241b);--red:light-dark(#c8102e,#a50e26);
+--green:light-dark(#1f6f43,#3fa56c);--greenink:#ffffff;--yellow:#ffc93c;--tint:light-dark(#f6f3ee,#1b2b21)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Nunito,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:Fredoka,Nunito,sans-serif;line-height:1.05;text-wrap:balance;margin:0}
+.band{padding:clamp(24px,4vw,56px) max(5vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+.top{background:var(--red);color:#fff;padding-bottom:clamp(20px,3vw,36px)}
+.top h1{font-size:clamp(32px,5vw,48px);font-weight:700}
+.top p{margin:10px 0 0;max-width:62ch;font-size:17px;color:#fff}
+.top .note{font-size:14px;opacity:.9}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,2vw,22px);margin-top:-8px}
+.shirt{position:relative;background:var(--card);border:2px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s}
+.shirt:hover{transform:translateY(-2px)}
+.shirt[aria-pressed=true]{border-color:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 35%,transparent)}
+.shirt img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#fff}
+.shirt .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
+.shirt h3{font-size:19px;font-weight:600}
+.meta{font-size:14px;color:var(--soft)}
+.price{white-space:nowrap;font-weight:800;color:var(--ink)}
+.price s{font-weight:400;color:var(--soft);margin-left:4px}
+.shirt .row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;padding-top:8px}
+.tick{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:15px;color:var(--green)}
+.tick .box{width:26px;height:26px;border-radius:8px;border:2px solid var(--green);display:grid;place-items:center;background:transparent}
+.shirt[aria-pressed=true] .box{background:var(--green)}
+.box svg{width:16px;height:16px;opacity:0}.shirt[aria-pressed=true] .box svg{opacity:1}
+.count{position:absolute;top:10px;right:10px;background:var(--yellow);color:#1d1b1a;font-weight:800;font-size:13px;border-radius:999px;padding:3px 10px}
+.count:empty{display:none}
+.shirt a{font-size:14px;color:var(--soft)}
+h2{font-size:clamp(26px,3.4vw,34px);font-weight:600;margin-bottom:6px}
+.lede{color:var(--soft);margin:0 0 18px;max-width:65ch}
+.form{display:grid;gap:18px;max-width:640px}
+label.f{font-weight:800;display:block;margin-bottom:6px}
+input[type=text],textarea{width:100%;font:16px Nunito,sans-serif;padding:12px 14px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);min-height:48px}
+textarea{min-height:110px;resize:vertical}
+input:focus-visible,textarea:focus-visible,button:focus-visible,.shirt:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.sizes{display:flex;flex-wrap:wrap;gap:8px}
+.sizes button{min-width:56px;min-height:46px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font:700 16px Nunito,sans-serif;cursor:pointer}
+.sizes button[aria-pressed=true]{background:var(--green);border-color:var(--green);color:var(--greenink)}
+.check{display:flex;gap:12px;align-items:center;font-weight:700;cursor:pointer;min-height:44px}
+.check input{width:24px;height:24px;accent-color:var(--green)}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+.btn{min-height:48px;padding:0 20px;border-radius:999px;border:0;background:var(--green);color:var(--greenink);font:800 16px Nunito,sans-serif;cursor:pointer}
+.btn.alt{background:transparent;color:var(--green);border:2px solid var(--green)}
+.btn:disabled{opacity:.5;cursor:default}
+.out{background:var(--tint);border-radius:14px;padding:14px 16px;font-weight:700;white-space:pre-wrap;overflow-wrap:anywhere}
+.status{font-size:15px;color:var(--soft);min-height:1.5em;margin:0}
+.res{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));align-items:start}
+.leader{display:flex;gap:16px;align-items:center;background:var(--tint);border-radius:18px;padding:14px}
+.leader img{width:110px;height:110px;border-radius:12px;object-fit:cover;flex:none;background:#fff}
+.leader b{font-family:Fredoka,sans-serif;font-size:24px;font-weight:600;display:block;line-height:1.1}
+.bars{display:grid;gap:10px;margin-top:16px}
+.bar{display:grid;grid-template-columns:minmax(0,9.5em) minmax(0,1fr) 2.5em;gap:10px;align-items:center;font-size:15px}
+.bar .t{height:16px;border-radius:999px;background:var(--line);overflow:hidden}
+.bar .t i{display:block;height:100%;background:var(--red);border-radius:999px;transition:width .4s}
+.bar .t i.win{background:var(--green)}
+.bar .n{text-align:right;font-weight:800}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--soft);font-weight:800}
+.order{background:var(--tint);border-radius:18px;padding:16px 18px;display:grid;gap:6px}
+.order .big{font-family:Fredoka,sans-serif;font-size:22px;font-weight:600;line-height:1.2}
+.pill{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:2px 10px;margin:2px 4px 2px 0;font-weight:800;white-space:nowrap}
+.x{background:none;border:0;color:var(--red);font:700 14px Nunito,sans-serif;cursor:pointer;min-height:36px;padding:0 6px}
+.owner{border:2px dashed var(--line);border-radius:18px;padding:18px;margin-top:26px}
+.owner[hidden]{display:none}
+.foot{font-size:13px;color:var(--soft)}
+@media(min-width:1100px){.grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media(max-width:600px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.shirt h3{font-size:16px}.shirt .body{padding:10px}.bar{grid-template-columns:minmax(0,7em) minmax(0,1fr) 2em}.leader img{width:84px;height:84px}
+table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px;border-bottom:1px solid var(--line)}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:6.5em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:6em;margin-inline-start:-6.5em;color:var(--soft);font-weight:700}.stack td:empty{display:none}}
+</style>
+<main>
+<header class="band top"><div class="wrap">
+<h1>Family Snoopy shirt vote</h1>
+<p>Vote for any shirt you like, shirt with most votes wins, yippee</p>
+</div></header>
+<section class="band" style="padding-top:clamp(18px,3vw,32px)"><div class="wrap"><div class="grid" id="grid"></div></div></section>
+<section class="band" style="background:var(--tint)"><div class="wrap">
+<h2>Your vote</h2>
+<form class="form" id="form" autocomplete="off">
+<div><label class="f" for="name">Your name</label><input type="text" id="name" maxlength="40" placeholder="Mom"></div>
+<div><span class="f" style="display:block;font-weight:800;margin-bottom:6px" id="sizeLbl">Your shirt size</span><div class="sizes" id="sizes" role="group" aria-labelledby="sizeLbl"></div></div>
+<label class="check"><input type="checkbox" id="blanket"> I want a Snoopy throw blanket too</label>
+<div class="btns"><button class="btn" type="submit" id="addBtn">Add my vote</button></div>
+<p class="status" id="status" role="status"></p>
+</form>
+</div></section>
+<section class="band"><div class="wrap">
+<h2>Results so far</h2>
+<p class="lede" id="resLede"></p>
+<div class="res">
+<div><div id="leader"></div><div class="bars" id="bars"></div></div>
+<div><h3 style="font-size:24px;font-weight:600;margin-bottom:10px">Order list for Dad</h3><div id="order"></div></div>
+</div>
+<h3 style="font-size:22px;font-weight:600;margin:28px 0 8px">Everyone's votes</h3>
+<table class="stack"><thead><tr><th>Name</th><th>Size</th><th>Blanket</th><th>Voted for</th></tr></thead><tbody id="rows"></tbody></table>
+</div></section>
+</main>
+<script src="../shared/config.js"></script>
+<script src="../shared/api.js"></script>
+<script>
+{
+const $=id=>document.getElementById(id);
+const APP='snoopy-vote';
+const IMG={1:'img/1.jpg',2:'img/2.jpg',3:'img/3.jpg',4:'img/4.jpg',5:'img/5.jpg',6:'img/6.jpg'};
+const SHIRTS=[
+{id:'skiing',img:'1',name:'Snoopy Skiing',sizes:'XS to 2XL',url:'https://www.kohls.com/product/prd-8405357/adult-peanuts-snoopy-skiing-graphic-tee.jsp'},
+{id:'merry',img:'2',name:'Merry and Bright',sizes:'XS to 2XL',url:'https://www.kohls.com/product/prd-8405353/adult-peanuts-merry-and-bright-graphic-tee.jsp'},
+{id:'chill',img:'3',name:'Chill Vibes',sizes:'XS to 2XL',url:'https://www.kohls.com/product/prd-8405361/adult-peanuts-snoopy-chill-vibes-graphic-tee.jsp'},
+{id:'season',img:'4',name:"'Tis the Season",sizes:'S to XXL',url:'https://www.macys.com/shop/product/hybrid-apparel-mens-snoopy-tis-the-season-t-shirt?ID=28627221'},
+{id:'sleigh',img:'5',name:'House Sleigh',sizes:'S to XXL',url:'https://www.macys.com/shop/product/hybrid-apparel-mens-snoopy-house-sleigh-graphic-classic-fit-t-shirt?ID=28522519'},
+{id:'snow',img:'6',name:'Let It Snow',sizes:'S to XXL',url:'https://www.macys.com/shop/product/hybrid-apparel-mens-snoopy-let-it-snow-graphic-t-shirt?ID=28522520'}];
+const SIZES=['XS','S','M','L','XL','2XL'];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const byId=Object.fromEntries(SHIRTS.map(s=>[s.id,s]));
+let votes=[],loaded=false,picks=new Set(),size='',busy=false;
+const API=window.GwenAPI, live=!!(API&&API.ready());
+const toVotes=entries=>(entries||[]).map(e=>{const d=e.data||{};return {name:e.key,picks:Array.isArray(d.picks)?d.picks.filter(p=>byId[p]):[],size:SIZES.includes(d.size)?d.size:'',blanket:!!d.blanket}});
+try{const d=JSON.parse(localStorage.getItem('snoopy-draft')||'{}');if(d.name)$('name').value=d.name;if(d.size)size=d.size;if(Array.isArray(d.picks))d.picks.forEach(p=>byId[p]&&picks.add(p));if(d.blanket)$('blanket').checked=true}catch(e){}
+const saveDraft=()=>{try{localStorage.setItem('snoopy-draft',JSON.stringify({name:$('name').value,size,picks:[...picks],blanket:$('blanket').checked}))}catch(e){}};
+const counts=()=>{const c=Object.fromEntries(SHIRTS.map(s=>[s.id,0]));votes.forEach(v=>(v.picks||[]).forEach(p=>{if(p in c)c[p]++}));return c};
+const check='<svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3L13 4.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function renderGrid(){const c=counts();
+$('grid').innerHTML=SHIRTS.map(s=>`<div class="shirt" role="button" tabindex="0" data-id="${s.id}" aria-pressed="${picks.has(s.id)}" aria-label="Vote for ${esc(s.name)}"><span class="count">${c[s.id]?c[s.id]+(c[s.id]===1?' vote':' votes'):''}</span><img src="${IMG[s.img]}" alt="${esc(s.name)} shirt"><div class="body"><h3>${esc(s.name)}</h3><div class="meta">Sizes ${s.sizes}</div><div class="row"><span class="tick"><span class="box">${check}</span>${picks.has(s.id)?'Voted':'Vote'}</span><a href="${s.url}" target="_blank" rel="noopener">See it</a></div></div></div>`).join('')}
+function renderSizes(){$('sizes').innerHTML=SIZES.map(z=>`<button type="button" data-z="${z}" aria-pressed="${z===size}">${z}</button>`).join('')}
+function winners(){const c=counts();const max=Math.max(0,...Object.values(c));return {max,ids:max?SHIRTS.filter(s=>c[s.id]===max).map(s=>s.id):[],c}}
+function renderResults(){const n=votes.length;const {max,ids,c}=winners();
+$('resLede').textContent=!loaded?'Loading votes…':n?`${n} ${n===1?'person has':'people have'} voted.`:'No votes yet.';
+if(!ids.length)$('leader').innerHTML='';
+else if(ids.length===1){const s=byId[ids[0]];$('leader').innerHTML=`<div class="leader"><img src="${IMG[s.img]}" alt=""><div><span class="meta">In the lead</span><b>${esc(s.name)}</b><span class="meta">${max} ${max===1?'vote':'votes'}</span></div></div>`}
+else $('leader').innerHTML=`<div class="leader"><div><span class="meta">Tied at ${max} ${max===1?'vote':'votes'}</span><b>${ids.map(i=>esc(byId[i].name)).join(' and ')}</b></div></div>`;
+const top=Math.max(1,max);
+$('bars').innerHTML=[...SHIRTS].sort((a,b)=>c[b.id]-c[a.id]).map(s=>`<div class="bar"><span>${esc(s.name)}</span><span class="t"><i class="${ids.length===1&&ids[0]===s.id?'win':''}" style="width:${c[s.id]/top*100}%"></i></span><span class="n">${c[s.id]}</span></div>`).join('');
+const sc={};let bl=0;votes.forEach(v=>{if(SIZES.includes(v.size))sc[v.size]=(sc[v.size]||0)+1;if(v.blanket)bl++});
+if(!n)$('order').innerHTML='<div class="order"><span class="meta">Nothing to order yet.</span></div>';
+else{const w=ids.length===1?byId[ids[0]]:null;let h='<div class="order">';
+h+=w?`<span class="big">${n} × ${esc(w.name)}</span><a href="${w.url}" target="_blank" rel="noopener">Open the shirt page</a>`:`<span class="big">${n} shirts, design still tied</span>`;
+h+=`<div style="margin-top:6px">${SIZES.filter(z=>sc[z]).map(z=>`<span class="pill">${sc[z]} × ${z}</span>`).join('')}</div>`;
+if(w&&w.sizes.startsWith('S ')&&sc.XS)h+=`<span class="meta" style="color:var(--red);font-weight:700">This shirt starts at S, so the XS ${sc.XS===1?'person':'people'} will need a different size.</span>`;
+h+=`<span style="margin-top:6px"><b>Snoopy throw blankets:</b> ${bl}</span></div>`;$('order').innerHTML=h}
+$('rows').innerHTML=n?votes.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name))).map(v=>`<tr><td data-l="Name"><b>${esc(v.name)}</b></td><td data-l="Size">${esc(v.size||'')}</td><td data-l="Blanket">${v.blanket?'Yes':'No'}</td><td data-l="Voted for">${(v.picks||[]).filter(p=>byId[p]).map(p=>esc(byId[p].name)).join(', ')}</td></tr>`).join(''):`<tr><td colspan="4" class="meta">${loaded?'No votes yet.':'Loading…'}</td></tr>`}
+function renderAll(){renderGrid();renderSizes();renderResults()}
+function setVotes(entries){votes=toVotes(entries);loaded=true;renderGrid();renderResults()}
+function load(){if(!live){loaded=true;renderResults();return}API.list(APP).then(setVotes).catch(()=>{if(!loaded)$('resLede').textContent='Couldn\'t load votes right now.'})}
+$('grid').addEventListener('click',e=>{if(e.target.closest('a'))return;const card=e.target.closest('.shirt');if(!card)return;const id=card.dataset.id;picks.has(id)?picks.delete(id):picks.add(id);saveDraft();renderGrid()});
+$('grid').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('shirt')){e.preventDefault();const id=e.target.dataset.id;picks.has(id)?picks.delete(id):picks.add(id);saveDraft();renderGrid();const el=$('grid').querySelector(`[data-id="${id}"]`);el&&el.focus()}});
+$('sizes').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;size=b.dataset.z;saveDraft();renderSizes()});
+$('name').addEventListener('input',saveDraft);$('blanket').addEventListener('change',saveDraft);
+$('form').addEventListener('submit',e=>{e.preventDefault();if(busy)return;
+const name=$('name').value.trim();
+if(!name){$('status').textContent='Add your name first.';return}if(!picks.size){$('status').textContent='Tap at least one shirt.';return}if(!size){$('status').textContent='Pick your shirt size.';return}
+if(!live){$('status').textContent='Voting isn\'t connected yet.';return}
+busy=true;$('addBtn').disabled=true;$('status').textContent='Saving…';
+API.put(APP,name,{picks:[...picks],size,blanket:$('blanket').checked}).then(v=>{busy=false;$('addBtn').disabled=false;setVotes(v);$('status').textContent=`Got it, ${name}! Vote again with the same name to change it.`})
+.catch(err=>{busy=false;$('addBtn').disabled=false;$('status').textContent='Couldn\'t save. Try again.'})});
+renderAll();load();setInterval(load,20000);
+}
+</script>
+</body>
+</html>
